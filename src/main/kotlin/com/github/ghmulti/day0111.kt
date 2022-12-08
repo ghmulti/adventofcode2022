@@ -17,29 +17,29 @@ private fun String.parseCommand(): Cmd = when {
 }
 
 private fun Context.processCommand(cmd: Cmd): Context = when(cmd.cmdType) {
-    CmdType.LS -> this
-    CmdType.CD -> cmd.arg?.let { path -> this.moveTo(path) } ?: error("no path provided for cd")
+    CmdType.LS -> this // do nothing
+    CmdType.CD -> cmd.arg?.let { path -> moveTo(path) } ?: error("no path provided for cd")
 }
 
-private fun Context.enrichNode(obj: Obj) {
+private fun Context.enrichNode(obj: Obj): Context {
     if (currentNode.children.map { it.value }.contains(obj)) {
         // do nothing, already exist
     } else {
         currentNode.children.add(TreeNode(value = obj, parent = this@enrichNode.currentNode))
     }
+    return this
 }
 
 fun day0111() {
     val root = TreeNode(Obj(name = "/", isFolder = true, size = 0))
-    var context = Context(
-        root = root,
-        currentNode = root,
-    )
     "day0111.txt".pathTo().toFile().useLines { lines ->
-        lines.forEachIndexed { index, line ->
+        lines.fold(Context(
+            root = root,
+            currentNode = root,
+        )) { context, line ->
             //println("Processing line [$line], Children ${context.currentNode.children.map { it.value.name }}")
             when {
-                line.isCommand() -> context = context.processCommand(line.parseCommand())
+                line.isCommand() -> context.processCommand(line.parseCommand())
                 else -> context.enrichNode(line.parseInfo())
             }
             //println("Line: ${index+1}, currentNodeInfo: ${context.currentNode.value.name}, number of elements=${context.currentNode.children.size}, parent=${context.currentNode.parent?.value?.name}")
