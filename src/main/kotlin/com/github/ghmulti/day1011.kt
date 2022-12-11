@@ -1,21 +1,19 @@
 package com.github.ghmulti
 
-import java.math.BigInteger
-
 private fun defineMonkeys(): Sequence<Monkey> = sequence {
-    "day1011_test.txt".pathTo().toFile().useLines { lines ->
+    "day1011.txt".pathTo().toFile().useLines { lines ->
         val monkeys = lines.chunked(7).map { monkeyLines ->
             Monkey(
                 worryLevels = monkeyLines[1].substringAfter("Starting items:").split(",").map { it.trim().toLong() }.let { ArrayDeque(it) },
                 operation = { old ->
                     when {
                         monkeyLines[2].contains("*") -> {
-                            val secondArg = if (monkeyLines[2].substringAfter("*").contains("old")) old else monkeyLines[2].substringAfter("*").trim().toLong()
-                            old * secondArg
+                            val containsOld = monkeyLines[2].substringAfter("*").contains("old")
+                            (old * old).takeIf { containsOld } ?: (old * monkeyLines[2].substringAfter("*").trim().toLong())
                         }
                         monkeyLines[2].contains("+") -> {
-                            val secondArg = if (monkeyLines[2].substringAfter("+").contains("old")) old else monkeyLines[2].substringAfter("+").trim().toLong()
-                            old + secondArg
+                            val containsOld = monkeyLines[2].substringAfter("+").contains("old")
+                            (old + old).takeIf { containsOld } ?: (old + monkeyLines[2].substringAfter("+").trim().toLong())
                         }
                         else -> error("unexpected")
                     }
@@ -44,46 +42,34 @@ private data class Monkey(
 typealias NewMonkeyIndex = Int
 
 fun main() {
-//    val result = (1..20).fold(defineMonkeys().toList()) { monkeys, round ->
-//        monkeys.forEachIndexed { index, monkey ->
-//            while (monkey.worryLevels.isNotEmpty()) {
-//                val level = monkey.worryLevels.removeFirst()
-//                val newLevel = (monkey.operation(level) / 3)
-//                val targetMonkey = monkey.test(newLevel)
-//                //println("Monkey[$index] targetMonkey for newLevel=$newLevel is $targetMonkey [level=$level]")
-//                monkeys[targetMonkey].worryLevels.addLast(newLevel)
-//                monkey.counter += 1
-//            }
-//        }
-//        //println("Worry levels after round $round")
-//        //monkeys.map { it.worryLevels }.forEach { println(it) }
-//        monkeys
-//    }
-//    val monkeyBusinessLevel = result.map { it.counter }.sortedDescending().take(2).let { it.first() * it.last() }
-//    "Level of monkey business $monkeyBusinessLevel".cowsay("day 11")
-
-    val result2 = (1..1000).fold(defineMonkeys().toList()) { monkeys, round ->
-        monkeys.forEachIndexed { index, monkey ->
-            val targetMonkeys = mutableListOf<Int>()
+    val result = (1..20).fold(defineMonkeys().toList()) { monkeys, round ->
+        monkeys.forEach { monkey ->
             while (monkey.worryLevels.isNotEmpty()) {
                 val level = monkey.worryLevels.removeFirst()
-                val newLevel = monkey.operation(level)
+                val newLevel = (monkey.operation(level) / 3)
                 val targetMonkey = monkey.test(newLevel)
-                //println("Monkey[$index] targetMonkey for newLevel=$newLevel is $targetMonkey [level=$level]")
                 monkeys[targetMonkey].worryLevels.addLast(newLevel)
                 monkey.counter += 1
-                targetMonkeys.add(targetMonkey)
             }
-            println("Monkey[$index]: $targetMonkeys")
         }
-        println("Round $round ===")
-        if (round == 1000 || round == 1 || round == 20 ) {
-            //println("${monkeys.map { it.counter }}")
+        monkeys
+    }
+    val monkeyBusinessLevel = result.map { it.counter }.sortedDescending().take(2).let { it.first() * it.last() }
+    "Level of monkey business $monkeyBusinessLevel".cowsay("day 11")
+
+    val result2 = (1..10_000).fold(defineMonkeys().toList()) { monkeys, round ->
+        val dd = monkeys.fold(1) { acc, monk -> acc * monk.dividableBy}
+        monkeys.forEach { monkey ->
+            while (monkey.worryLevels.isNotEmpty()) {
+                val level = monkey.worryLevels.removeFirst()
+                val newLevel = monkey.operation(level) % dd
+                val targetMonkey = monkey.test(newLevel)
+                monkeys[targetMonkey].worryLevels.addLast(newLevel)
+                monkey.counter += 1
+            }
         }
-        //println("Worry levels after round $round")
-        //monkeys.map { it.worryLevels }.forEach { println(it) }
         monkeys
     }
     val monkeyBusinessLevel2 = result2.map { it.counter }.sortedDescending().take(2).let { it.first() * it.last() }
-    "Level of monkey business $monkeyBusinessLevel2".cowsay("day 11")
+    "Level of monkey business v2 $monkeyBusinessLevel2".cowsay("day 11")
 }
