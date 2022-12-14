@@ -15,10 +15,10 @@ private fun chunks(filename: String): Sequence<List<Int>> = sequence {
     }
 }
 
-fun day0001() {
-    val maxChunk = chunks("day0001.txt").maxBy { it.sum() }
+fun day00000() {
+    val maxChunk = chunks("day00000.txt").maxBy { it.sum() }
     "Elf with most calories: ${maxChunk.sum()}".cowsay("day01")
 
-    val top3maxChunk = chunks("day0001.txt").map { it.sum() }.sortedDescending().take(3).toList()
+    val top3maxChunk = chunks("day00000.txt").map { it.sum() }.sortedDescending().take(3).toList()
     "Top 3 elfs with most calories: ${top3maxChunk.sum()}".cowsay("day01")
 }

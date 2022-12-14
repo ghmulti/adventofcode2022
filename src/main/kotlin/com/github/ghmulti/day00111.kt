@@ -30,8 +30,8 @@ private fun Tree.calculateScenticScore(matrix: List<List<Int>>): Int {
     return p1 * p2 * p3 * p4
 }
 
-fun day1000() {
-    val matrix = "day1000.txt".pathTo().toFile().readLines().toMatrix()
+fun day00111() {
+    val matrix = "day00111.txt".pathTo().toFile().readLines().toMatrix()
 
     val entries = matrix.flatMapIndexed { row, rows ->
         rows.mapIndexedNotNull { column, value ->

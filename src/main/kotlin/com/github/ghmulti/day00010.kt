@@ -19,13 +19,13 @@ private fun List<String>.toPriority(): Int {
     return intersect.toPriority()
 }
 
-fun day0011() {
-    val sumOfPriorities = "day0011.txt".pathTo().toFile().useLines { lines ->
+fun day00010() {
+    val sumOfPriorities = "day00010.txt".pathTo().toFile().useLines { lines ->
         lines.sumOf { line -> line.toPriority() }
     }
     "Sum of priorities by locating in both compartments of rucksack is $sumOfPriorities".cowsay("day3")
 
-    val sumOfPrioritiesByBadges = "day0011.txt".pathTo().toFile().useLines { lines ->
+    val sumOfPrioritiesByBadges = "day00010.txt".pathTo().toFile().useLines { lines ->
         lines.chunked(3)
             .sumOf { chunk -> chunk.toPriority() }
     }

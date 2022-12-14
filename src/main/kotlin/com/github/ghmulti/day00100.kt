@@ -25,7 +25,7 @@ private fun String.parseCommand(): Command {
         ?.let { Command(amount = it[0].toInt(), it[1].toInt(), it[2].toInt()) } ?: error("Invalid command")
 }
 
-private fun readDeques() = "day0101.txt".pathTo().toFile().useLines { lines ->
+private fun readDeques() = "day00100.txt".pathTo().toFile().useLines { lines ->
     val stacks = lines.takeWhile { it.isNotEmpty() }.toMutableList().apply { removeLast() }
     println("Given:")
     stacks.forEach { println(it) }
@@ -34,10 +34,10 @@ private fun readDeques() = "day0101.txt".pathTo().toFile().useLines { lines ->
     return@useLines deques
 }
 
-fun day0101() {
+fun day00100() {
     run {
         val deques = readDeques()
-        "day0101.txt".pathTo().toFile().useLines { lines ->
+        "day00100.txt".pathTo().toFile().useLines { lines ->
             lines.dropWhile { !it.contains("move") }.forEachIndexed { index, line ->
                 val command = line.parseCommand()
                 //println("Command: $command [$index]")
@@ -57,7 +57,7 @@ fun day0101() {
 
     run {
         val deques = readDeques()
-        "day0101.txt".pathTo().toFile().useLines { lines ->
+        "day00100.txt".pathTo().toFile().useLines { lines ->
             lines.dropWhile { !it.contains("move") }.forEachIndexed { index, line ->
                 val command = line.parseCommand()
                 //println("Command: $command [$index]")

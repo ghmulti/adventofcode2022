@@ -51,8 +51,8 @@ private fun String.parseRow2() = this.split(" ").let {
     opponentEntry to it.last().calculateFigure(opponentEntry)
 }
 
-fun day0010() {
-    val yourScore = "day0010.txt".pathTo().toFile().useLines {
+fun day00001() {
+    val yourScore = "day00001.txt".pathTo().toFile().useLines {
         it.sumOf { row ->
             val (opponentEntry, yourEntry) = row.parseRow1()
             //println("$opponentEntry against $yourEntry")
@@ -62,7 +62,7 @@ fun day0010() {
     }
     "Your score with assumed strategy in championship is $yourScore".cowsay("day 2")
 
-    val yourScoreWithFixedStrategy = "day0010.txt".pathTo().toFile().useLines {
+    val yourScoreWithFixedStrategy = "day00001.txt".pathTo().toFile().useLines {
         it.sumOf { row ->
             val (opponentEntry, yourEntry) = row.parseRow2()
             //println("$opponentEntry against $yourEntry")

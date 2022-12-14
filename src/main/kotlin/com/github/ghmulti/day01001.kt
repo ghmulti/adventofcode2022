@@ -1,7 +1,7 @@
 package com.github.ghmulti
 
-fun day1010() {
-    val state = "day1010.txt".pathTo().toFile().useLines { lines ->
+fun day01001() {
+    val state = "day01001.txt".pathTo().toFile().useLines { lines ->
         lines.fold(SignalState(
             x = 1,
             steps = mutableListOf()

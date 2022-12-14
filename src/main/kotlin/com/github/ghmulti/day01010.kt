@@ -1,7 +1,7 @@
 package com.github.ghmulti
 
 private fun defineMonkeys(): Sequence<Monkey> = sequence {
-    "day1011.txt".pathTo().toFile().useLines { lines ->
+    "day01010.txt".pathTo().toFile().useLines { lines ->
         val monkeys = lines.chunked(7).map { monkeyLines ->
             Monkey(
                 worryLevels = monkeyLines[1].substringAfter("Starting items:").split(",").map { it.trim().toLong() }.let { ArrayDeque(it) },
@@ -41,7 +41,7 @@ private data class Monkey(
 
 typealias NewMonkeyIndex = Int
 
-fun main() {
+fun day01010() {
     val result = (1..20).fold(defineMonkeys().toList()) { monkeys, round ->
         monkeys.forEach { monkey ->
             while (monkey.worryLevels.isNotEmpty()) {

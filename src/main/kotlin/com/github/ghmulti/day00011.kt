@@ -16,13 +16,13 @@ private fun String.overlapsBy(overlappingFunc: OverlappingFunc): Boolean {
     return overlappingFunc(range1, range2)
 }
 
-fun day0100() {
-    val fullyOverlappingAssignments = "day0100.txt".pathTo().toFile().useLines { lines ->
+fun day00011() {
+    val fullyOverlappingAssignments = "day00011.txt".pathTo().toFile().useLines { lines ->
         lines.sumOf { line -> 1.takeIf { line.overlapsBy(::withinOverlappingFunc) } ?: 0 }
     }
     "$fullyOverlappingAssignments assignments has fully overlapping ranges".cowsay("day4")
 
-    val partiallyOverlappingAssignments = "day0100.txt".pathTo().toFile().useLines { lines ->
+    val partiallyOverlappingAssignments = "day00011.txt".pathTo().toFile().useLines { lines ->
         lines.sumOf { line -> 1.takeIf { line.overlapsBy(::intersectsOverlappingFunc) } ?: 0 }
     }
     "$partiallyOverlappingAssignments assignments has partially overlapping ranges".cowsay("day4")

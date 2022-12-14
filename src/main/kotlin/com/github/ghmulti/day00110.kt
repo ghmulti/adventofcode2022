@@ -30,9 +30,9 @@ private fun Context.enrichNode(obj: Obj): Context {
     return this
 }
 
-fun day0111() {
+fun day00110() {
     val root = TreeNode(Obj(name = "/", isFolder = true, size = 0))
-    "day0111.txt".pathTo().toFile().useLines { lines ->
+    "day00110.txt".pathTo().toFile().useLines { lines ->
         lines.fold(Context(
             root = root,
             currentNode = root,

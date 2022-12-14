@@ -5,8 +5,8 @@ private fun String.findStartOf(size: Int) =
         .takeWhile { str -> str.toSet().size < size }
         .let { it.size + size }
 
-fun day0110() {
-    val line = "day0110.txt".pathTo().toFile().readLines().first()
+fun day00101() {
+    val line = "day00101.txt".pathTo().toFile().readLines().first()
     "Start-of-packet index is ${line.findStartOf(4)}".cowsay("day6")
     "Start-of-message index is ${line.findStartOf(14)}".cowsay("day6")
 }

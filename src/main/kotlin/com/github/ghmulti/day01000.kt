@@ -31,13 +31,13 @@ private fun calculateState(lines: Sequence<String>, length: Int): State {
     }
 }
 
-fun day1001() {
-    val resultState = "day1001.txt".pathTo().toFile().useLines { lines ->
+fun day01000() {
+    val resultState = "day01000.txt".pathTo().toFile().useLines { lines ->
         calculateState(lines, 2)
     }
     "Number of visited tail positions for short rope: ${resultState.tailVisitedPositions.toSet().size}".cowsay("day 9")
 
-    val resultStateV2 = "day1001.txt".pathTo().toFile().useLines { lines ->
+    val resultStateV2 = "day01000.txt".pathTo().toFile().useLines { lines ->
         calculateState(lines, 10)
     }
     "Number of visited tail positions for long rope: ${resultStateV2.tailVisitedPositions.toSet().size}".cowsay("day 9")

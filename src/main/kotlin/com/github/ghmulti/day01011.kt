@@ -36,8 +36,8 @@ private fun List<GridPosition>.calculate(grid: List<List<Char>>, target: GridPos
     }
 }
 
-fun day1100() {
-    val initialGrid = "day1100.txt".pathTo().toFile().readLines().map { it.toList() }
+fun day01011() {
+    val initialGrid = "day01011.txt".pathTo().toFile().readLines().map { it.toList() }
 
     val grid = initialGrid.map { row ->
         row.map { ch -> ch.takeIf { ch != 'S' } ?: 'a' }.map { ch -> ch.takeIf { ch != 'E' } ?: 'z' }

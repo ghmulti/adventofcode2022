@@ -77,8 +77,8 @@ private fun compare(left: String, right: String): Res {
     return Res.CHECK
 }
 
-fun day1101() {
-    "day1101.txt".pathTo().toFile().useLines { lines ->
+fun day01100() {
+    "day01100.txt".pathTo().toFile().useLines { lines ->
         val windowed = lines.windowed(size = 2, step = 3).toList()
         val packets = windowed.mapIndexed { index, pairs ->
             when (compare(pairs.first(), pairs.last())) {

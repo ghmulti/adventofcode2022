@@ -75,9 +75,9 @@ private fun Slice.dropSand(): Coord? {
 @Suppress("unused")
 private fun Slice.drawMatrix() = buildMatrix().forEach { println(it.joinToString("")) }
 
-fun day1110() {
+fun day01101() {
     //val src = sample.lines()
-    val src = "day1110.txt".pathTo().toFile().readLines()
+    val src = "day01101.txt".pathTo().toFile().readLines()
     val paths = src.map { line ->
         line.split(" -> ").map { coord -> coord.split(",").let { c -> Coord(c.first().toInt(), c.last().toInt()) } }
     }
