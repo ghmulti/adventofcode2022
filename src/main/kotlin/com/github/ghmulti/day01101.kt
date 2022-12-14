@@ -1,5 +1,8 @@
 package com.github.ghmulti
 
+import java.util.concurrent.TimeUnit
+import kotlin.system.measureTimeMillis
+
 @Suppress("unused")
 private val sample = """
 498,4 -> 498,6 -> 496,6
@@ -81,14 +84,20 @@ fun day01101() {
     val paths = src.map { line ->
         line.split(" -> ").map { coord -> coord.split(",").let { c -> Coord(c.first().toInt(), c.last().toInt()) } }
     }
-    val slice = Slice(paths)
-    while (slice.dropSand() != null) {
+    val ms1 = measureTimeMillis {
+        val slice = Slice(paths)
+        while (slice.dropSand() != null) {
+            //slice.drawMatrix()
+        }
         //slice.drawMatrix()
+        "${slice.sand.size} units of sand come to rest before sand starts flowing into the abyss below".cowsay("day 14") // 1072
     }
-    //slice.drawMatrix()
-    "${slice.sand.size} units of sand come to rest before sand starts flowing into the abyss below".cowsay("day 14") // 1072
+    println("Part1 took=${TimeUnit.MILLISECONDS.toSeconds(ms1)}s")
 
-    //part2(paths)
+    val ms2 = measureTimeMillis {
+        //part2(paths)
+    }
+    println("Part2 took=${TimeUnit.MILLISECONDS.toSeconds(ms2)}s")
 }
 
 @Suppress("unused")
@@ -100,8 +109,8 @@ private fun part2(paths: List<List<Coord>>) {
     val length = maxX - minX
     val slice2 = Slice(paths = paths + listOf(listOf(Coord(SAND_LATCH.x - maxOf(length, maxY), maxY), Coord(SAND_LATCH.x + maxOf(length, maxY), maxY))))
     while (slice2.dropSand() != null) {
-        //slice.drawMatrix()
+        //slice2.drawMatrix()
     }
-    //slice.drawMatrix()
+    slice2.drawMatrix()
     "${slice2.sand.size + 1} units of sand come to rest before the source of the sand becomes blocked".cowsay("day 14") // 24659
 }
