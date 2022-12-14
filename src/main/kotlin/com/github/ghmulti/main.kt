@@ -31,6 +31,7 @@ fun main() {
     day1010()
     day1100()
     day1101()
+    day1110()
 }
 
 fun String.pathTo(): Path = Path.of("src", "main", "resources", this)
