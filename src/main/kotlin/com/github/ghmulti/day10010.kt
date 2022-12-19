@@ -56,48 +56,55 @@ private fun Experiment.collectMinerals() {
 
 private val rand = Random()
 
-private fun Experiment.assembleRobots(): List<Experiment.() -> Unit> {
-    val effects = mutableListOf<Experiment.() -> Unit>()
+private data class Effect(val before: Experiment.() -> Unit, val after: Experiment.() -> Unit)
+
+private fun Experiment.assembleRobotsDecisions(): List<Effect> {
     if (blueprint.priceForGeodeRobot.enoughMinerals()) {
-//        println("Starting construction Geode robot")
-        blueprint.priceForGeodeRobot.buyRobot()
-        effects.add { geodsRobots += 1 }
-        return effects
+        return listOf(Effect(before = { blueprint.priceForGeodeRobot.buyRobot() }, after = { geodsRobots += 1 }))
     }
+    val decisions = mutableListOf(Effect(before = {}, after = {}))
     if (blueprint.priceForObsidianRobot.enoughMinerals()) {
-//        println("Starting construction Obsidian robot")
-        blueprint.priceForObsidianRobot.buyRobot()
-        effects.add { obsidianRobots += 1 }
+        decisions.add(Effect(before = { blueprint.priceForObsidianRobot.buyRobot() }, after = { obsidianRobots += 1 }))
     }
     if (blueprint.priceForOreRobot.enoughMinerals()) {
-//                println("Starting construction Ore robot")
-        blueprint.priceForOreRobot.buyRobot()
-        effects.add { oreRobots += 1 }
+        decisions.add(Effect(before = { blueprint.priceForOreRobot.buyRobot() }, after = { oreRobots += 1 }))
     }
-
     if (blueprint.priceForClayRobot.enoughMinerals()) {
-//                println("Starting construction Clay robot")
-        blueprint.priceForClayRobot.buyRobot()
-        effects.add { clayRobots += 1 }
+        decisions.add(Effect(before = { blueprint.priceForClayRobot.buyRobot() }, after = { clayRobots += 1 }))
     }
-    return effects
+    return decisions
 }
 
 private fun Experiment.displayState() {
     println("Collected ore=$oreCollected [$oreRobots], clay=$clayCollected [$clayRobots], obsidian=$obsidianCollected [$obsidianRobots], geod=$geodsCollected [$geodsRobots]")
 }
 
-private fun runExperiment(blueprint: Blueprint): Int {
-    val experiment = Experiment(blueprint)
-    while (experiment.hasTime()) {
-//        println("=====Minute ${experiment.counter}=====")
-        val effects = experiment.assembleRobots()
-        experiment.collectMinerals()
-//        experiment.displayState()
-        experiment.counter += 1
-        effects.forEach { it.invoke(experiment) }
+private fun runExperiment(experiment: Experiment): Int {
+    /*
+    if (!experiment.hasTime()) {
+        return experiment.geodsCollected
     }
-    return experiment.geodsCollected
+
+    val decisions = experiment.assembleRobotsDecisions()
+    if (decisions.size == 1) {
+        val (before, after) = decisions.first()
+        experiment.before()
+        experiment.collectMinerals()
+        experiment.counter += 1
+        experiment.after()
+        return runExperiment(experiment)
+    }
+
+    return decisions.maxOf { decision ->
+        val localExperiment = experiment.copy()
+        val (before, after) = decision
+        localExperiment.before()
+        localExperiment.collectMinerals()
+        localExperiment.counter += 1
+        localExperiment.after()
+        runExperiment(localExperiment)
+    }
+     */
 }
 
 fun main() {
@@ -123,9 +130,7 @@ fun main() {
 //    blueprints.forEach { println(it) }
 
     blueprints.map { blueprint ->
-        val maxGeods = (1..100000).maxOf {
-            runExperiment(blueprint)
-        }
+        val maxGeods = runExperiment(Experiment(blueprint))
         println(maxGeods)
     }
 }
