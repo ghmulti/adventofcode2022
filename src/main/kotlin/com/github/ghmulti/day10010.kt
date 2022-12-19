@@ -1,5 +1,9 @@
 package com.github.ghmulti
 
+import java.util.*
+import kotlin.collections.ArrayDeque
+
+@Suppress("unused")
 private val blueprintLines = """
 Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.
 Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.
@@ -42,9 +46,10 @@ private data class Experiment(
     var obsidianCollected: Int = 0,
     var geodsRobots: Int = 0,
     var geodsCollected: Int = 0,
+    var limit: Int,
 )
 
-private fun Experiment.hasTime(): Boolean = counter <= 24
+private fun Experiment.hasTime(): Boolean = counter <= limit
 
 private fun Experiment.collectMinerals() {
     oreCollected += oreRobots
@@ -72,13 +77,15 @@ private fun Experiment.assembleRobotsDecisions(): List<Effect> {
     return decisions
 }
 
+@Suppress("unused")
 private fun Experiment.displayState() {
     println("Collected ore=$oreCollected [$oreRobots], clay=$clayCollected [$clayRobots], obsidian=$obsidianCollected [$obsidianRobots], geod=$geodsCollected [$geodsRobots]")
 }
 
 private fun runExperiment(experiment: Experiment): Experiment {
+    // dfs algorithm
     val stack = ArrayDeque(listOf(experiment))
-    val calculated = mutableMapOf<Int, Experiment>()
+    val calculated = TreeMap<Int, Experiment>()
     val checked = mutableSetOf<Experiment>()
     while (stack.isNotEmpty()) {
         val top = stack.removeFirst()
@@ -94,6 +101,10 @@ private fun runExperiment(experiment: Experiment): Experiment {
                 .filter { exp ->
                     !checked.contains(exp)
                 }
+                .filter {
+                    val prevCollected = calculated.headMap(it.counter).maxOfOrNull { e -> e.value.geodsCollected } ?: 0
+                    prevCollected <= it.geodsCollected
+                }
 
             modifiedExperiment.forEach {
                 stack.addFirst(it)
@@ -102,38 +113,45 @@ private fun runExperiment(experiment: Experiment): Experiment {
             }
         }
     }
-    return calculated.getValue(25)
+    return calculated.getValue(experiment.limit + 1)
 }
 
-fun main() {
+private fun List<String>.parseBlueprints() = map { line ->
+    Blueprint(
+        id = line.substringAfter("Blueprint ").substringBefore(":").trim().toInt(),
+        priceForOreRobot = Price(
+            ore = line.substringAfter("Each ore robot costs").substringBefore("ore").trim().toInt(),
+        ),
+        priceForClayRobot = Price(
+            ore = line.substringAfter("Each clay robot costs").substringBefore("ore").trim().toInt(),
+        ),
+        priceForObsidianRobot = Price(
+            ore = line.substringAfter("Each obsidian robot costs").substringBefore("ore").trim().toInt(),
+            clay = line.substringAfter("Each obsidian robot costs").substringAfter("and").substringBefore("clay").trim().toInt()
+        ),
+        priceForGeodeRobot = Price(
+            ore = line.substringAfter("Each geode robot costs").substringBefore("ore").trim().toInt(),
+            obsidian = line.substringAfter("Each geode robot costs").substringAfter("and").substringBefore("obsidian").trim().toInt()
+        )
+    )
+}
+
+fun day10010() {
     val bpLines = "day10010.txt".pathTo().toFile().readLines()
 //    val bpLines = blueprintLines.lines()
-    val blueprints = bpLines.map { line ->
-        Blueprint(
-            id = line.substringAfter("Blueprint ").substringBefore(":").trim().toInt(),
-            priceForOreRobot = Price(
-                ore = line.substringAfter("Each ore robot costs").substringBefore("ore").trim().toInt(),
-            ),
-            priceForClayRobot = Price(
-                ore = line.substringAfter("Each clay robot costs").substringBefore("ore").trim().toInt(),
-            ),
-            priceForObsidianRobot = Price(
-                ore = line.substringAfter("Each obsidian robot costs").substringBefore("ore").trim().toInt(),
-                clay = line.substringAfter("Each obsidian robot costs").substringAfter("and").substringBefore("clay").trim().toInt()
-            ),
-            priceForGeodeRobot = Price(
-                ore = line.substringAfter("Each geode robot costs").substringBefore("ore").trim().toInt(),
-                obsidian = line.substringAfter("Each geode robot costs").substringAfter("and").substringBefore("obsidian").trim().toInt()
-            )
-        )
-    }
-
-//    blueprints.forEach { println(it) }
+    val blueprints = bpLines.parseBlueprints()
 
     val qualityLevels = blueprints.map { blueprint ->
-        val bestExperiment = runExperiment(Experiment(blueprint))
+        val bestExperiment = runExperiment(Experiment(blueprint = blueprint, limit = 24))
         println("Max geods for ${blueprint.id}: ${bestExperiment.geodsCollected}")
         blueprint.id * bestExperiment.geodsCollected
     }
-    println("Quality levels: $qualityLevels, sum = ${qualityLevels.sum()}")
+    "Quality levels: $qualityLevels, sum = ${qualityLevels.sum()}".cowsay("day 19")
+
+    val geodsCollected = blueprints.take(3).map { blueprint ->
+        val bestExperiment = runExperiment(Experiment(blueprint = blueprint, limit = 32))
+        println("Max geods for ${blueprint.id}: ${bestExperiment.geodsCollected}")
+        bestExperiment.geodsCollected
+    }
+    "The largest number of geodes you could open using each of the first three blueprints is ${geodsCollected.fold(1) { acc, e -> acc * e}}".cowsay("day 19")
 }
