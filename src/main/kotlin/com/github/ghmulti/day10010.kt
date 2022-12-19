@@ -1,7 +1,5 @@
 package com.github.ghmulti
 
-import java.util.Random
-
 private val blueprintLines = """
 Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.
 Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.
@@ -14,6 +12,7 @@ private data class Price(
 )
 
 private data class Blueprint(
+    val id: Int,
     val priceForOreRobot: Price,
     val priceForClayRobot: Price,
     val priceForObsidianRobot: Price,
@@ -54,8 +53,6 @@ private fun Experiment.collectMinerals() {
     geodsCollected += geodsRobots
 }
 
-private val rand = Random()
-
 private data class Effect(val before: Experiment.() -> Unit, val after: Experiment.() -> Unit)
 
 private fun Experiment.assembleRobotsDecisions(): List<Effect> {
@@ -79,37 +76,41 @@ private fun Experiment.displayState() {
     println("Collected ore=$oreCollected [$oreRobots], clay=$clayCollected [$clayRobots], obsidian=$obsidianCollected [$obsidianRobots], geod=$geodsCollected [$geodsRobots]")
 }
 
-private fun runExperiment(experiment: Experiment): Int {
-    /*
-    if (!experiment.hasTime()) {
-        return experiment.geodsCollected
-    }
+private fun runExperiment(experiment: Experiment): Experiment {
+    val stack = ArrayDeque(listOf(experiment))
+    val calculated = mutableMapOf<Int, Experiment>()
+    val checked = mutableSetOf<Experiment>()
+    while (stack.isNotEmpty()) {
+        val top = stack.removeFirst()
+        if (top.hasTime()) {
+            val modifiedExperiment = top.assembleRobotsDecisions().map { (before, after) ->
+                val localExperiment = top.copy()
+                localExperiment.before()
+                localExperiment.collectMinerals()
+                localExperiment.counter += 1
+                localExperiment.after()
+                localExperiment
+            }
+                .filter { exp ->
+                    !checked.contains(exp)
+                }
 
-    val decisions = experiment.assembleRobotsDecisions()
-    if (decisions.size == 1) {
-        val (before, after) = decisions.first()
-        experiment.before()
-        experiment.collectMinerals()
-        experiment.counter += 1
-        experiment.after()
-        return runExperiment(experiment)
+            modifiedExperiment.forEach {
+                stack.addFirst(it)
+                calculated[it.counter] = it.takeIf { it.geodsCollected >= (calculated[it.counter]?.geodsCollected ?: 0) } ?: calculated.getValue(it.counter)
+                checked.add(it)
+            }
+        }
     }
-
-    return decisions.maxOf { decision ->
-        val localExperiment = experiment.copy()
-        val (before, after) = decision
-        localExperiment.before()
-        localExperiment.collectMinerals()
-        localExperiment.counter += 1
-        localExperiment.after()
-        runExperiment(localExperiment)
-    }
-     */
+    return calculated.getValue(25)
 }
 
 fun main() {
-    val blueprints = blueprintLines.lines().map { line ->
+    val bpLines = "day10010.txt".pathTo().toFile().readLines()
+//    val bpLines = blueprintLines.lines()
+    val blueprints = bpLines.map { line ->
         Blueprint(
+            id = line.substringAfter("Blueprint ").substringBefore(":").trim().toInt(),
             priceForOreRobot = Price(
                 ore = line.substringAfter("Each ore robot costs").substringBefore("ore").trim().toInt(),
             ),
@@ -129,8 +130,10 @@ fun main() {
 
 //    blueprints.forEach { println(it) }
 
-    blueprints.map { blueprint ->
-        val maxGeods = runExperiment(Experiment(blueprint))
-        println(maxGeods)
+    val qualityLevels = blueprints.map { blueprint ->
+        val bestExperiment = runExperiment(Experiment(blueprint))
+        println("Max geods for ${blueprint.id}: ${bestExperiment.geodsCollected}")
+        blueprint.id * bestExperiment.geodsCollected
     }
+    println("Quality levels: $qualityLevels, sum = ${qualityLevels.sum()}")
 }
