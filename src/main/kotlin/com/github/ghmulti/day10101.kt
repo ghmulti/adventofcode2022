@@ -125,7 +125,7 @@ private fun Journey.calculateNewPosition(pwd: PositionWithDirection): PositionWi
                 pwd.copy(position = newPosition)
             } else {
                 when (cubeSide) {
-                    1 -> PositionWithDirection(cubeSize * 3 - y % cubeSize - 1 to cubeSize * 4 - 1, Direction.LEFT) // 6
+                    1 -> PositionWithDirection(cubeSize * 3 - y - 1 to cubeSize * 4 - 1, Direction.LEFT) // 6
                     4 -> PositionWithDirection(cubeSize * 2 to cubeSize * 4 - y % cubeSize - 1, Direction.DOWN) // 6
                     6 -> PositionWithDirection(cubeSize - y % cubeSize - 1 to cubeSize * 3 - 1, Direction.LEFT) // 1
 
@@ -145,7 +145,7 @@ private fun Pair<Int, Int>.change2(length: Int): PositionWithDirection {
             return@fold pwd
         }
         path.add(newPositionWithDirection)
-        println("Moving from $pwd to $newPositionWithDirection [current side ${cubeSide(pwd.position, cubeSize)}] -> [target side ${cubeSide(newPositionWithDirection.position, cubeSize)}]")
+//        println("Moving from $pwd to $newPositionWithDirection [current side ${cubeSide(pwd.position, cubeSize)}] -> [target side ${cubeSide(newPositionWithDirection.position, cubeSize)}]")
         newPositionWithDirection
     }
     return targetPosition
@@ -287,7 +287,7 @@ fun main() {
 //    journey2.draw()
 
     while (journey2.instructions.isNotEmpty()) {
-        println("Next instruction: ${journey2.instructions.first()}")
+//        println("Next instruction: ${journey2.instructions.first()}")
         journey2.move(false)
 //        journey2.draw()
     }
