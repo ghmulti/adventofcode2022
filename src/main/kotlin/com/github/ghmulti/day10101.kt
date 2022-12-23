@@ -199,7 +199,7 @@ private fun List<List<Tile>>.rotate90(): List<List<Tile>> = (indices).map { ind 
 
 fun main() {
 //    println(testMap)
-//    val lines = testMap.lines() to 4
+//    val (lines, cubeSize) = testMap.lines() to 4
     val (lines, cubeSize) = "day10101.txt".pathTo().toFile().readLines() to 50
     val width = lines.first().length
     val linesNormalized = lines.map { line ->
@@ -260,26 +260,17 @@ fun main() {
     val result1 = 1000 * (journey.position.first + 1) + 4 * (journey.position.second + 1) + journey.direction.code
     "The final password is: 1000 * ${journey.position.first + 1} + 4 * ${journey.position.second + 1} + ${journey.direction.code} = $result1".cowsay("day 22")
 
-    val emptyTile = (0 until 50).map { (0 until 50).map { Tile(symbol = ' ', walkable = false, isWall = false, isEmpty = true) } }
-    val tile1 = tiles.subList(0, 50).map { it.subList(50, 100) }
-    val tile6 = tiles.subList(0, 50).map { it.subList(100, 150) }.rotate90().rotate90()
-    val tile4 = tiles.subList(50, 100).map { it.subList(50, 100) }
-    val tile5 = tiles.subList(100, 150).map { it.subList(50, 100) }
-    val tile3 = tiles.subList(100, 150).map { it.subList(0, 50) }.rotate90().rotate90().rotate90()
-    val tile2 = tiles.subList(150, 200).map { it.subList(0, 50) }.rotate90().rotate90().rotate90()
-    val part2Tiles: List<List<Tile>> = listOf(
-        (0 until cubeSize).map { ind -> emptyTile[ind] + emptyTile[ind] + tile1[ind] + emptyTile[ind] },
-        (0 until cubeSize).map { ind -> tile2[ind] + tile3[ind] + tile4[ind] + emptyTile[ind] },
-        (0 until cubeSize).map { ind -> emptyTile[ind] + emptyTile[ind] + tile5[ind] + tile6[ind] },
-    ).flatten()
+    val tiles2 = part2Tiles(tiles, cubeSize)
+    val defaultPosition2 = tiles2.first().indexOfFirst { it.walkable }.let { 0 to it }
+//    val defaultPosition2 = defaultPosition
+//    val tiles2 = tiles
 
-    val defaultPosition2 = part2Tiles.first().indexOfFirst { it.walkable }.let { 0 to it }
     val journey2 = Journey(
-        tiles = part2Tiles,
+        tiles = tiles2,
         position = defaultPosition2,
         direction = Direction.RIGHT,
         instructions = ArrayDeque(path),
-        path = mutableListOf(PositionWithDirection(defaultPosition, Direction.RIGHT)),
+        path = mutableListOf(PositionWithDirection(defaultPosition2, Direction.RIGHT)),
         cubeSize = cubeSize,
     )
 
@@ -318,6 +309,21 @@ fun main() {
 //        mutableListOf(),
 //        3
 //    ).draw()
+}
+
+private fun part2Tiles(tiles: List<List<Tile>>, cubeSize: Int): List<List<Tile>> {
+    val emptyTile = (0 until 50).map { (0 until 50).map { Tile(symbol = ' ', walkable = false, isWall = false, isEmpty = true) } }
+    val tile1 = tiles.subList(0, 50).map { it.subList(50, 100) }
+    val tile6 = tiles.subList(0, 50).map { it.subList(100, 150) }.rotate90().rotate90()
+    val tile4 = tiles.subList(50, 100).map { it.subList(50, 100) }
+    val tile5 = tiles.subList(100, 150).map { it.subList(50, 100) }
+    val tile3 = tiles.subList(100, 150).map { it.subList(0, 50) }.rotate90().rotate90().rotate90()
+    val tile2 = tiles.subList(150, 200).map { it.subList(0, 50) }.rotate90().rotate90().rotate90()
+    return listOf(
+        (0 until cubeSize).map { ind -> emptyTile[ind] + emptyTile[ind] + tile1[ind] + emptyTile[ind] },
+        (0 until cubeSize).map { ind -> tile2[ind] + tile3[ind] + tile4[ind] + emptyTile[ind] },
+        (0 until cubeSize).map { ind -> emptyTile[ind] + emptyTile[ind] + tile5[ind] + tile6[ind] },
+    ).flatten()
 }
 
 private fun dummyTile(ch: Char) = Tile(ch,false,false,false)
