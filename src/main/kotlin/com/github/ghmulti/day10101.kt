@@ -80,6 +80,7 @@ private fun Journey.draw() {
         tilesRow.mapIndexed { column, tile ->
             val pathWithDirection = path.firstOrNull { it.position == row to column }
             when {
+                position == row to column -> "x"
                 pathWithDirection?.direction == Direction.DOWN -> "v"
                 pathWithDirection?.direction == Direction.UP -> "^"
                 pathWithDirection?.direction == Direction.LEFT -> "<"
@@ -95,7 +96,15 @@ fun main() {
 //    println(testMap)
 //    val lines = testMap.lines()
     val lines = "day10101.txt".pathTo().toFile().readLines()
-    val tiles = lines.takeWhile { it.isNotEmpty() }.map { line ->
+    val width = lines.first().length
+    val linesNormalized = lines.map { line ->
+        if (line.length < width) {
+            line + " ".repeat(width - line.length)
+        } else {
+            line
+        }
+    }
+    val tiles = linesNormalized.takeWhile { it.isNotBlank() }.map { line ->
         line.map { symbol ->
             Tile(
                 symbol = symbol,
