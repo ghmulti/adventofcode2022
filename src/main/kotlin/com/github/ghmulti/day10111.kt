@@ -131,22 +131,18 @@ private fun Expedition.findPositionsToGo(): List<Expedition> {
     }
 }
 
-private fun EPosition.distanceTo(other: EPosition): Double {
-    return sqrt((other.column.toDouble() - column)*(other.column - column) + (other.row - row)*(other.row - row))
-}
-
 private data class PositionWithBlizzards(val position: EPosition, val blizzards: List<EPosition>)
 
 private fun List<EPosition>.adjacentBlizzards(position: EPosition): List<EPosition> {
     return filter { abs(it.column - position.column) <= 2 && abs(it.row - position.row) <= 2 }
 }
 
-private fun expeditionBfs(expedition: Expedition, start: EPosition, target: EPosition): Expedition {
+private fun expeditionBfs(expedition: Expedition, target: EPosition): Expedition {
     val queue = ArrayDeque(listOf(expedition))
     val visited = mutableSetOf<PositionWithBlizzards>()
     while (queue.isNotEmpty()) {
         val first = queue.removeFirst()
-        println("Checking path [current path=${first.path.size}], current position ${first.position}")
+//        println("Checking path [current path=${first.path.size}], current position ${first.position}")
         if (first.position == target) {
             println("Reached target!")
             return first
@@ -166,8 +162,10 @@ fun main() {
 //    val lines = example.lines()
     val lines = "day10111.txt".pathTo().toFile().readLines()
 
+    val defaultPosition = defaultPosition(lines)
+    val targetPosition = targetPosition(lines)
     val expedition = Expedition(
-        position = defaultPosition(lines),
+        position = defaultPosition,
         walls = findWalls(lines),
         blizzards = findBlizzards(lines),
         path = mutableListOf(),
@@ -177,7 +175,23 @@ fun main() {
 //    println("Walls: ${expedition.walls}")
 //    println("Blizzards: ${expedition.blizzards}")
 
-    val bfsExpedition = expeditionBfs(expedition, defaultPosition(lines), targetPosition(lines))
-    println("Finished bfs, shortest path ${bfsExpedition.path.size}")
-    bfsExpedition.path.forEach { println(it) }
+    val firstExpedition = expeditionBfs(expedition, targetPosition)
+    println("Finished first expedition, shortest path ${firstExpedition.path.size}")
+//    bfsExpedition.path.forEach { println(it) }
+
+    val expeditionBack = firstExpedition.copy(
+        path = mutableListOf(),
+    )
+    val secondExpedition = expeditionBfs(expeditionBack, defaultPosition)
+    println("Finished second expedition, shortest path ${secondExpedition.path.size}")
+
+    val expeditionBackAndForth = secondExpedition.copy(
+        path = mutableListOf()
+    )
+    val thirdExpedition = expeditionBfs(expeditionBackAndForth, targetPosition)
+    println("Finished third expedition, shortest path ${thirdExpedition.path.size}")
+
+    val sum = firstExpedition.path.size + secondExpedition.path.size + thirdExpedition.path.size
+    "$sum is the fewest number of minutes required to reach the goal, go back to the start, then reach the goal again"
+        .cowsay("day 24")
 }
